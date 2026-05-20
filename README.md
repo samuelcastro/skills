@@ -31,6 +31,75 @@ npx skills add samuelcastro/skills/super-orchestrator
 
 The CLI fetches the skill folder from this repo and installs it into your local agent's skills directory (e.g. `~/.claude/skills/` for Claude Code). After install, the skill is discoverable by name + description and activates when its description matches the task.
 
+## Full stack — install the upstream skills too
+
+**This collection is the orchestration layer.** The autonomous "Ralph Loop" workflow it implements stands on three upstream skill collections, all open source, all on skills.sh, all maintained by their original authors so you get bug fixes and improvements over time. Install the full stack like this:
+
+```bash
+# 1. obra/superpowers (200k★)  — the execution backbone the workers load
+#    Provides: test-driven-development, verification-before-completion,
+#              systematic-debugging, writing-plans, subagent-driven-development,
+#              dispatching-parallel-agents, using-git-worktrees, ...
+npx skills add obra/superpowers
+
+# 2. garrytan/gstack (100k★)   — the role-based advisors the workers vote with
+#    Provides: plan-ceo-review, plan-eng-review, plan-design-review, cso,
+#              office-hours, ship, review, qa, investigate, ...
+npx skills add garrytan/gstack
+
+# 3. A GSD variant              — spec → phase breakdown (optional but recommended
+#                                 for green-field projects; pick ONE)
+npx skills add shoootyou/get-shit-done-multi
+# or:  npx skills add gsd-build/gsd-2
+# or:  npx skills add ctsstc/get-shit-done-skills
+
+# 4. samuelcastro/skills        — the Ralph Loop / orchestrator (this repo)
+npx skills add samuelcastro/skills/super-build
+npx skills add samuelcastro/skills/super-orchestrator
+# (and the others as needed: super-qa, super-ux, super-review, super-truth)
+```
+
+### How the layers fit
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│  samuelcastro/skills   ←  Ralph Loop / orchestration layer     │
+│  (super-build, super-orchestrator, super-qa, super-ux, ...)    │
+│  dispatches headless `claude -p` workers, manages worktrees,   │
+│  reads GitHub Projects, halts on human gates.                  │
+└────┬───────────────────────┬───────────────────────┬───────────┘
+     │                       │                       │
+     ▼                       ▼                       ▼
+┌──────────────┐    ┌────────────────────┐    ┌────────────────┐
+│ A GSD skill  │    │ garrytan/gstack    │    │ obra/superpowers│
+│ (optional)   │    │                    │    │                 │
+│              │    │ Role-based         │    │ TDD-first       │
+│ Spec → phase │    │ decisions inside   │    │ execution       │
+│ breakdown    │    │ each worker        │    │ inside each     │
+│ (e.g. /plan- │    │ (CEO / eng /       │    │ worker          │
+│ phase)       │    │ design / cso vote) │    │ (TDD, verify-   │
+│              │    │                    │    │ before-complete)│
+└──────────────┘    └────────────────────┘    └────────────────┘
+     used to               called from                 loaded by
+     curate the            the worker                  the worker
+     Ready queue           preamble                    preamble
+```
+
+- **The video that inspired this** ([Tech with Tim style "Spec-Driven Development with GStack + GSD + Superpowers"](https://www.youtube.com/watch?v=Xb8E3MZECzg) and similar overnight-build demos) describes exactly this stack. samuelcastro/skills is the autonomous-loop layer on top.
+- **You can use samuelcastro/skills standalone**, but the worker preambles reference the upstream skills by name. Without obra/superpowers and garrytan/gstack installed, workers will fall back to inline role-play and best-effort TDD — still works, but less rigorous.
+- **Why we don't bundle them.** They're actively developed (obra/superpowers shipped v5.1.0 in May 2026; garrytan/gstack is on v1.42.x). Bundling would freeze them at a single point in time and miss every upstream improvement. Installing them separately means your stack stays current.
+
+### Skill-reference resolution
+
+Worker preambles reference upstream skills as `superpowers:<skill-name>` (the Claude Code plugin-marketplace form). Two install paths exist; either works:
+
+| Install path | Skill resolves as |
+|---|---|
+| Claude Code: `/plugin install superpowers@claude-plugins-official` | `superpowers:test-driven-development` (prefixed) |
+| skills.sh CLI: `npx skills add obra/superpowers` | `test-driven-development` (unprefixed, top-level) |
+
+If you used the skills.sh CLI, the preamble's `superpowers:X` references resolve to the unprefixed `X` skill in your local `.agents/skills/` directory. Both forms point at the same upstream skill; pick whichever your agent runtime supports.
+
 ## Layout
 
 This repo follows the [Agent Skills specification](https://agentskills.io/specification):

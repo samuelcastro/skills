@@ -31,6 +31,13 @@ You are running UNATTENDED inside **super-build**, dispatched to work on a singl
    - `superpowers:verification-before-completion` (always, before final commit)
    Invoke each via the Skill tool BEFORE writing any code.
 
+   **Skill name resolution.** These reference [obra/superpowers](https://github.com/obra/superpowers). Two install paths exist for that upstream collection, and the skill name your runtime sees depends on which path the user used:
+
+   - Claude Code plugin marketplace (`/plugin install superpowers@claude-plugins-official`) → skills register with the prefix: `superpowers:test-driven-development`.
+   - skills.sh CLI (`npx skills add obra/superpowers`) → skills register without the prefix at the top level of the skills dir: `test-driven-development`.
+
+   Try the prefixed form first; if your `Skill` tool reports "not found", retry with the unprefixed form. If neither resolves, the user has not installed obra/superpowers — fall back to inline role-play of the TDD discipline (write a failing test, then make it pass) and note "superpowers not installed; using inline TDD" in your final assistant message so the operator can fix it.
+
 5. **Honor the per-issue gate contract** (TDD, atomic commits, lint/typecheck/test green, etc.). Plan-only issues skip the execution + tests gates. Review-only issues skip implementation gates. Do not expand product scope beyond the issue body; when scope is missing or unsafe, use WIP-PARTIAL or HUMAN GATE instead of guessing.
 
 6. **After completing all issue work, you MUST:**

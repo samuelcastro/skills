@@ -37,6 +37,13 @@ This loop is sequential and runs many iterations back-to-back. To prevent worker
 - `superpowers:verification-before-completion` (before claiming a fix done)
 - `playwright-best-practices` (load when writing or refactoring a spec). Reference its `locators.md` (data-testid first, `getByRole` fallback), `fixtures-hooks.md`, `test-data.md`, `assertions-waiting.md`, and `page-object-model.md`.
 
+**Skill name resolution.** These reference [obra/superpowers](https://github.com/obra/superpowers). Two install paths give different name forms:
+
+- Claude Code plugin marketplace install → prefixed (`superpowers:test-driven-development`).
+- skills.sh CLI install (`npx skills add obra/superpowers`) → unprefixed (`test-driven-development`).
+
+Try the prefixed form first; if your `Skill` tool reports "not found", retry with the unprefixed form. If neither resolves, the user has not installed obra/superpowers — fall back to inline role-play of the TDD discipline and note "superpowers not installed; using inline TDD" in `iteration-N.md` Section 8.
+
 For ANY decision point — bug-vs-flake, severity, what subtree to expand — call your eng/architecture advisor once. Document the verdict in `iteration-N.md` as a one-liner. Escalate per the budget rule above.
 
 ## Test target & safety rails (HARD RULES)
